@@ -4,10 +4,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace mf_apis_web_services_fuel_manager_luan.Models
 {
     [Table("Consumos")]
-    public class Consumo
+    public class Consumo : LinksHATEOS
     {
         [Key]
-        public int ID { get; set; }
+        public int Id { get; set; }
         [Required]
         public string Descricao { get; set; }
         [Required]

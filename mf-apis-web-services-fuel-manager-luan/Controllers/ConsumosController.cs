@@ -1,5 +1,4 @@
-﻿
-using mf_apis_web_services_fuel_manager_luan.Models;
+﻿using mf_apis_web_services_fuel_manager_luan.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,12 +7,12 @@ namespace mf_apis_web_services_fuel_manager_luan.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class VeiculosController : ControllerBase
+    public class ConsumosController : ControllerBase
     {
 
         private readonly AppDbContext _context;
 
-        public VeiculosController(AppDbContext context)
+        public ConsumosController(AppDbContext context)
         {
             _context = context;
         }
@@ -21,21 +20,15 @@ namespace mf_apis_web_services_fuel_manager_luan.Controllers
         [HttpGet]
         public async Task<ActionResult> GetAll()
         {
-            var model = await _context.Veiculos.ToListAsync();
+            var model = await _context.Consumos.ToListAsync();
 
             return Ok(model);
         }
 
         [HttpPost]
-        public async Task<ActionResult> Create(Veiculo model)
+        public async Task<ActionResult> Create(Consumo model)
         {
-
-            if(model.AnoFabricacao <= 0 || model.AnoModelo <= 0)
-            {
-                return BadRequest(new {nassage = "Ano de Fabricacao e Modelo devem ser maiores que zero"});
-            }
-
-            _context.Veiculos.Add(model);
+            _context.Consumos.Add(model);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetById", new { id = model.Id }, model);
@@ -45,28 +38,27 @@ namespace mf_apis_web_services_fuel_manager_luan.Controllers
         public async Task<ActionResult> GetbyId(int id)
         {
 
-            var model = await _context.Veiculos
-                .Include(t => t.Consumos)
+            var model = await _context.Consumos
                 .FirstOrDefaultAsync(c => c.Id == id);
 
             if (model == null) return NotFound();
 
             GerarLinks(model);
-            return Ok(model);   
+            return Ok(model);
 
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> Update(int id, Veiculo model)
+        public async Task<ActionResult> Update(int id, Consumo model)
         {
             if (id != model.Id) return BadRequest();
 
-            var modeloDb = await _context.Veiculos.AsNoTracking()
+            var modeloDb = await _context.Consumos.AsNoTracking()
                 .FirstOrDefaultAsync(c => c.Id == id);
 
-            if (modeloDb == null) return NotFound(); 
+            if (modeloDb == null) return NotFound();
 
-            _context.Veiculos.Update(model);
+            _context.Consumos.Update(model);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -75,11 +67,11 @@ namespace mf_apis_web_services_fuel_manager_luan.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var model = await _context.Veiculos.FindAsync(id);
+            var model = await _context.Consumos.FindAsync(id);
 
             if (model == null) return NotFound();
-                        
-            _context.Veiculos.Remove(model);   
+
+            _context.Consumos.Remove(model);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -87,12 +79,13 @@ namespace mf_apis_web_services_fuel_manager_luan.Controllers
 
         }
 
-        private void GerarLinks(Veiculo model)
+        private void GerarLinks(Consumo model)
         {
-            model.Links.Add(new LinkDto(model.Id ,Url.ActionLink(), rel: "self", metodo: "GET"));
+            model.Links.Add(new LinkDto(model.Id, Url.ActionLink(), rel: "self", metodo: "GET"));
             model.Links.Add(new LinkDto(model.Id, Url.ActionLink(), rel: "update", metodo: "PUT"));
             model.Links.Add(new LinkDto(model.Id, Url.ActionLink(), rel: "delete", metodo: "delete"));
 
         }
+
     }
 }
