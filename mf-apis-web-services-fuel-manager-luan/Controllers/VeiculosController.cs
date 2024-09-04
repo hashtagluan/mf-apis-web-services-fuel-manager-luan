@@ -30,9 +30,9 @@ namespace mf_apis_web_services_fuel_manager_luan.Controllers
         public async Task<ActionResult> Create(Veiculo model)
         {
 
-            if(model.AnoFabricacao <= 0 || model.AnoModelo <= 0)
+            if (model.AnoFabricacao <= 0 || model.AnoModelo <= 0)
             {
-                return BadRequest(new {nassage = "Ano de Fabricacao e Modelo devem ser maiores que zero"});
+                return BadRequest(new { nassage = "Ano de Fabricacao e Modelo devem ser maiores que zero" });
             }
 
             _context.Veiculos.Add(model);
@@ -46,13 +46,14 @@ namespace mf_apis_web_services_fuel_manager_luan.Controllers
         {
 
             var model = await _context.Veiculos
+                .Include(t => t.Usuarios).ThenInclude(t => t.Usuario)
                 .Include(t => t.Consumos)
                 .FirstOrDefaultAsync(c => c.Id == id);
 
             if (model == null) return NotFound();
 
             GerarLinks(model);
-            return Ok(model);   
+            return Ok(model);
 
         }
 
@@ -64,7 +65,7 @@ namespace mf_apis_web_services_fuel_manager_luan.Controllers
             var modeloDb = await _context.Veiculos.AsNoTracking()
                 .FirstOrDefaultAsync(c => c.Id == id);
 
-            if (modeloDb == null) return NotFound(); 
+            if (modeloDb == null) return NotFound();
 
             _context.Veiculos.Update(model);
             await _context.SaveChangesAsync();
@@ -78,8 +79,8 @@ namespace mf_apis_web_services_fuel_manager_luan.Controllers
             var model = await _context.Veiculos.FindAsync(id);
 
             if (model == null) return NotFound();
-                        
-            _context.Veiculos.Remove(model);   
+
+            _context.Veiculos.Remove(model);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -89,10 +90,38 @@ namespace mf_apis_web_services_fuel_manager_luan.Controllers
 
         private void GerarLinks(Veiculo model)
         {
-            model.Links.Add(new LinkDto(model.Id ,Url.ActionLink(), rel: "self", metodo: "GET"));
+            model.Links.Add(new LinkDto(model.Id, Url.ActionLink(), rel: "self", metodo: "GET"));
             model.Links.Add(new LinkDto(model.Id, Url.ActionLink(), rel: "update", metodo: "PUT"));
             model.Links.Add(new LinkDto(model.Id, Url.ActionLink(), rel: "delete", metodo: "delete"));
 
         }
+
+        [HttpPost("{id}/usuarios")]
+        public async Task<ActionResult> AddUsuario(int id, VeiculoUsuarios model)
+        {
+            if( id != model.VeiculoId) return BadRequest();
+            _context.VeiculoUsuarios.Add(model);
+            await _context.SaveChangesAsync(); 
+
+            return CreatedAtAction("GetById", new {id = model.VeiculoId}, model);
+
+
+        }
+
+        [HttpDelete("{id}/usuarios/{usuarioId}")]
+        public async Task<ActionResult> DeleteUsuario(int id, int usuarioId)
+        {
+            var model = await _context.VeiculoUsuarios
+                .Where(c => c.VeiculoId == id && c.UsuarioId == usuarioId)
+                .FirstOrDefaultAsync();
+
+            if(model == null) return NotFound();
+
+            _context.VeiculoUsuarios.Remove(model);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+      }
     }
-}

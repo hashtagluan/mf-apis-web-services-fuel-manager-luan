@@ -23,5 +23,8 @@ namespace mf_apis_web_services_fuel_manager_luan.Models
 
         public ICollection<Consumo> Consumos { get; set; }
 
+        public ICollection<VeiculoUsuarios> Usuarios { get; set; }
     }
+
 }
+
