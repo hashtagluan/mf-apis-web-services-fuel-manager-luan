@@ -1,11 +1,13 @@
 ﻿
 using mf_apis_web_services_fuel_manager_luan.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace mf_apis_web_services_fuel_manager_luan.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class VeiculosController : ControllerBase
@@ -18,6 +20,8 @@ namespace mf_apis_web_services_fuel_manager_luan.Controllers
             _context = context;
         }
 
+
+        [Authorize(Roles = "Usuario")]
         [HttpGet]
         public async Task<ActionResult> GetAll()
         {
@@ -41,6 +45,7 @@ namespace mf_apis_web_services_fuel_manager_luan.Controllers
             return CreatedAtAction("GetById", new { id = model.Id }, model);
         }
 
+        [Authorize(Roles = "Administrador")]
         [HttpGet("{id}")]
         public async Task<ActionResult> GetbyId(int id)
         {

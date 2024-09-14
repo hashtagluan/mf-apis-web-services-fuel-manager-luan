@@ -1,10 +1,12 @@
 ﻿using mf_apis_web_services_fuel_manager_luan.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace mf_apis_web_services_fuel_manager_luan.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ConsumosController : ControllerBase
